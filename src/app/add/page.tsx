@@ -1,8 +1,12 @@
 "use client";
 
 import { SavePlaceInput, savePlace } from "@/lib/backend/place/place";
-import { useState } from "react";
+import { getAuth } from "firebase/auth";
+import { useEffect, useState } from "react";
 import GooglePlacesAutocomplete from "react-google-places-autocomplete";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { initFirebase } from "@/lib/frontend/firebase/firebase";
+import { redirect } from "next/navigation";
 
 const useServerActionMutate = (
   action: (input: SavePlaceInput) => Promise<any>
@@ -26,6 +30,8 @@ const useServerActionMutate = (
   return { error, isLoading, isSuccess, mutate };
 };
 
+initFirebase();
+
 export default function AddPage() {
   const onChange = async (id: string) => {
     setPlaceId(id);
@@ -35,6 +41,14 @@ export default function AddPage() {
   const [exceptionalThings, setExceptionalThings] = useState<string>("");
 
   const { mutate, isLoading, isSuccess } = useServerActionMutate(savePlace);
+
+  const [authState, loading] = useAuthState(getAuth());
+
+  useEffect(() => {
+    if (!authState && !loading) {
+      redirect("/signup");
+    }
+  }, [authState, loading]);
 
   if (isSuccess) {
     return (

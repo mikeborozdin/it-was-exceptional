@@ -10,6 +10,7 @@ interface Place {
   name: string;
   website: string;
   address: {
+    city: string;
     street: string;
     postalCode: string;
     country: string;
@@ -50,6 +51,7 @@ const getPlace = async (id: string): Promise<Place> => {
     website: json.data.website,
     address: {
       street: json.data.address.street,
+      city: json.data.address.city,
       postalCode: json.data.address.postalCode,
       country: json.data.address.country,
     },
