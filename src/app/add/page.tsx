@@ -101,7 +101,10 @@ export default function AddPage() {
               if (placeId) {
                 mutate({
                   googlePlaceId: placeId,
-                  userId: authState!.uid,
+                  user: {
+                    id: authState!.uid,
+                    name: authState!.displayName || authState!.email || "",
+                  },
                   whatExceptionalAboutIt,
                 });
               }

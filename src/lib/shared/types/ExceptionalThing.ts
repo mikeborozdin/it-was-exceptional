@@ -9,6 +9,10 @@ interface ExceptionalThing {
     country: string;
     postalCode: string;
   };
+  user: {
+    id: string;
+    name: string;
+  };
   website?: string;
 }
 

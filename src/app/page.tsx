@@ -33,7 +33,7 @@ export default function Home() {
         {exceptionalThings?.map((thing, index) => (
           <div key={index}>
             <div>
-              Mike says{" "}
+              {thing.user.name} says{" "}
               <Link
                 href={`/exceptional/${thing.id}`}
                 className="font-bold underline"

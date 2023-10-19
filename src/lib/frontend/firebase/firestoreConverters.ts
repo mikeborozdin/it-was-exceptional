@@ -27,6 +27,10 @@ const exceptionalThingConverter: FirestoreDataConverter<ExceptionalThing> = {
         country: data.address.country,
         postalCode: data.address.postalCode,
       },
+      user: {
+        id: data.user.id,
+        name: data.user.name,
+      },
       website: data.url,
     };
   },

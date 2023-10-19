@@ -61,12 +61,12 @@ const getPlace = async (googlePlaceId: string): Promise<Place> => {
 
 type SavePlaceInput = Pick<
   ExceptionalThing,
-  "googlePlaceId" | "whatExceptionalAboutIt"
-> & { userId: string };
+  "googlePlaceId" | "whatExceptionalAboutIt" | "user"
+>;
 
 const savePlace = async ({
   googlePlaceId,
-  userId,
+  user,
   whatExceptionalAboutIt,
 }: SavePlaceInput) => {
   const place = await getPlace(googlePlaceId);
@@ -75,7 +75,7 @@ const savePlace = async ({
     .collection(FirestoreCollections.exceptionalPlaces)
     .add({
       ...place,
-      userId,
+      user,
       whatExceptionalAboutIt,
     });
 };

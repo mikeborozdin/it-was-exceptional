@@ -3,40 +3,17 @@
 import { initFirebase } from "@/lib/frontend/firebase/firebase";
 import { getAuth } from "firebase/auth";
 import { useSignInWithGoogle } from "react-firebase-hooks/auth";
-import { initFirestore } from "@/lib/frontend/firebase/firestore";
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { FirestoreCollections } from "@/lib/shared/firestore/firestore";
 
 initFirebase();
-
-const createUserIfNeeded = async (userId: string, name: string) => {
-  const firestore = initFirestore();
-
-  const userRef = await getDoc(
-    doc(firestore, FirestoreCollections.users, userId)
-  );
-
-  if (!userRef.exists()) {
-    await setDoc(doc(firestore, FirestoreCollections.users, userId), { name });
-  }
-};
 
 export default function SignUpPage() {
   const [signInWithGoogle] = useSignInWithGoogle(getAuth());
 
   const onSignUpWithGoogleClick = async () => {
-    try {
-      const res = await signInWithGoogle();
-      if (res && res.user) {
-        await createUserIfNeeded(
-          res.user.uid,
-          res.user.displayName || res.user.email || ""
-        );
+    const res = await signInWithGoogle();
 
-        window.location.replace("/account");
-      }
-    } catch (e) {
-      console.error(e);
+    if (res && res.user) {
+      window.location.replace("/account");
     }
   };
 
