@@ -16,9 +16,22 @@ interface Place {
     postalCode: string;
     country: string;
   };
+  profilePhoto: string | null;
+  googleMapsUrl: string;
 }
 
-type ZembraPlace = Place;
+type ZembraPlace = {
+  name: string;
+  website: string;
+  address: {
+    city: string;
+    street: string;
+    postalCode: string;
+    country: string;
+  };
+  profileImage: string | null;
+  url: string;
+};
 
 interface ZembraResult {
   data: ZembraPlace;
@@ -34,7 +47,7 @@ if (getApps().length === 0) {
 
 const getPlace = async (googlePlaceId: string): Promise<Place> => {
   const res = await fetch(
-    `https://api.zembra.io/business/google/?slug=${googlePlaceId}&fields[]=address&fields[]=name&fields[]=phone&fields[]=photos&fields[]=website`,
+    `https://api.zembra.io/business/google/?slug=${googlePlaceId}&fields[]=address&fields[]=name&fields[]=website&fields[]=profileImage&fields[]=url`,
     {
       headers: {
         Authorization:
@@ -56,6 +69,8 @@ const getPlace = async (googlePlaceId: string): Promise<Place> => {
       postalCode: json.data.address.postalCode,
       country: json.data.address.country,
     },
+    googleMapsUrl: json.data.url,
+    profilePhoto: json.data.profileImage,
   };
 };
 
@@ -77,6 +92,7 @@ const savePlace = async ({
       ...place,
       user,
       whatExceptionalAboutIt,
+      createdAt: new Date(),
     });
 };
 

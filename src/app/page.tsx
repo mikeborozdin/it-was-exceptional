@@ -4,15 +4,15 @@ import { getCountry } from "@/lib/frontend/countries/countries";
 import { initFirestore } from "@/lib/frontend/firebase/firestore";
 import { exceptionalThingConverter } from "@/lib/frontend/firebase/firestoreConverters";
 import { FirestoreCollections } from "@/lib/shared/firestore/firestore";
-import { collection } from "firebase/firestore";
+import { collection, orderBy, query } from "firebase/firestore";
 import Link from "next/link";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 
 export default function Home() {
   const [exceptionalThings] = useCollectionData(
-    collection(
-      initFirestore(),
-      FirestoreCollections.exceptionalPlaces
+    query(
+      collection(initFirestore(), FirestoreCollections.exceptionalPlaces),
+      orderBy("createdAt", "desc")
     ).withConverter(exceptionalThingConverter)
   );
 
