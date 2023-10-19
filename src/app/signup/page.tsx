@@ -2,19 +2,42 @@
 
 import { initFirebase } from "@/lib/frontend/firebase/firebase";
 import { getAuth } from "firebase/auth";
-import { useState } from "react";
 import { useSignInWithGoogle } from "react-firebase-hooks/auth";
+import { initFirestore } from "@/lib/frontend/firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { FirestoreCollections } from "@/lib/shared/firestore/firestore";
 
 initFirebase();
 
-export default function SignUpPage() {
-  const [placeId, setPlaceId] = useState<string | null>(null);
-  const [exceptionalThings, setExceptionalThings] = useState<string>("");
+const createUserIfNeeded = async (userId: string, name: string) => {
+  const firestore = initFirestore();
 
+  const userRef = await getDoc(
+    doc(firestore, FirestoreCollections.users, userId)
+  );
+
+  if (!userRef.exists()) {
+    await setDoc(doc(firestore, FirestoreCollections.users, userId), { name });
+  }
+};
+
+export default function SignUpPage() {
   const [signInWithGoogle] = useSignInWithGoogle(getAuth());
 
-  const onSignUpWithGoogleClick = () => {
-    signInWithGoogle();
+  const onSignUpWithGoogleClick = async () => {
+    try {
+      const res = await signInWithGoogle();
+      if (res && res.user) {
+        await createUserIfNeeded(
+          res.user.uid,
+          res.user.displayName || res.user.email || ""
+        );
+
+        window.location.replace("/account");
+      }
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   return (

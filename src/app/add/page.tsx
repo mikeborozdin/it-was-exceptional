@@ -18,7 +18,9 @@ const useServerActionMutate = (
   const mutate = async (input: SavePlaceInput) => {
     try {
       setIsLoading(true);
+      console.log("about to");
       await action(input);
+      console.log("success");
       setIsSuccess(true);
     } catch (e) {
       setError(e);
@@ -33,12 +35,9 @@ const useServerActionMutate = (
 initFirebase();
 
 export default function AddPage() {
-  const onChange = async (id: string) => {
-    setPlaceId(id);
-  };
-
   const [placeId, setPlaceId] = useState<string | null>(null);
-  const [exceptionalThings, setExceptionalThings] = useState<string>("");
+  const [whatExceptionalAboutIt, setWhatExceptionalAboutIt] =
+    useState<string>("");
 
   const { mutate, isLoading, isSuccess } = useServerActionMutate(savePlace);
 
@@ -58,10 +57,10 @@ export default function AddPage() {
     );
   } else {
     return (
-      <div>
+      <div className="space-y-3">
         <div>
           <h1 className="text-3xl text-white font-extrabold">
-            Tell us what you&apos; found exceptional
+            Tell us what you&apos;ve found exceptional
           </h1>
         </div>
 
@@ -72,8 +71,6 @@ export default function AddPage() {
             selectProps={{
               className: "w-full text-black",
               onChange: (value) => {
-                console.log(value);
-
                 if (value) {
                   setPlaceId(value.value.place_id);
                 }
@@ -87,14 +84,14 @@ export default function AddPage() {
             What&apos; exceptional about it?
           </label>
           <textarea
-            value={exceptionalThings}
-            onChange={(e) => setExceptionalThings(e.target.value)}
-            className="w-full h-32 p-3 text-black text-2xl"
+            value={whatExceptionalAboutIt}
+            onChange={(e) => setWhatExceptionalAboutIt(e.target.value)}
+            className="w-full h-32 p-3 text-black text-2xl rounded-lg"
             placeholder="I had such a lovely time there..."
           />
         </div>
 
-        <div className="w-full space-y-3">
+        <div className="w-full">
           <input
             type="submit"
             value="Add"
@@ -102,7 +99,11 @@ export default function AddPage() {
             disabled={isLoading}
             onClick={async () => {
               if (placeId) {
-                mutate({ id: placeId, exceptionalThings });
+                mutate({
+                  googlePlaceId: placeId,
+                  userId: authState!.uid,
+                  whatExceptionalAboutIt,
+                });
               }
             }}
           />

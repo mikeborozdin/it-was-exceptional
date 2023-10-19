@@ -15,7 +15,11 @@ const TopNavigation: React.FC = () => {
       <Link className="text-white font-extrabold" href="/">
         💎 It is exceptional
       </Link>
-      {authState && !loading && <strong>Hello, {authState.displayName}</strong>}
+      {authState && !loading && (
+        <Link href="/account" className="font-bold underline">
+          Hello, {authState.displayName}
+        </Link>
+      )}
     </div>
   );
 };

@@ -1,6 +1,7 @@
 "use server";
 
 import { FirestoreCollections } from "@/lib/shared/firestore/firestore";
+import { ExceptionalThing } from "@/lib/shared/types/ExceptionalThing";
 import { credential } from "firebase-admin";
 import { getApps, initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
@@ -31,9 +32,9 @@ if (getApps().length === 0) {
   });
 }
 
-const getPlace = async (id: string): Promise<Place> => {
+const getPlace = async (googlePlaceId: string): Promise<Place> => {
   const res = await fetch(
-    `https://api.zembra.io/business/google/?slug=${id}&fields[]=address&fields[]=name&fields[]=phone&fields[]=photos&fields[]=website`,
+    `https://api.zembra.io/business/google/?slug=${googlePlaceId}&fields[]=address&fields[]=name&fields[]=phone&fields[]=photos&fields[]=website`,
     {
       headers: {
         Authorization:
@@ -46,7 +47,7 @@ const getPlace = async (id: string): Promise<Place> => {
   const json = (await res.json()) as ZembraResult;
 
   return {
-    googlePlaceId: id,
+    googlePlaceId,
     name: json.data.name,
     website: json.data.website,
     address: {
@@ -58,22 +59,25 @@ const getPlace = async (id: string): Promise<Place> => {
   };
 };
 
-interface SavePlaceInput {
-  id: string;
-  exceptionalThings: string;
-}
+type SavePlaceInput = Pick<
+  ExceptionalThing,
+  "googlePlaceId" | "whatExceptionalAboutIt"
+> & { userId: string };
 
-const savePlace = async ({ id, exceptionalThings }: SavePlaceInput) => {
-  const place = await getPlace(id);
+const savePlace = async ({
+  googlePlaceId,
+  userId,
+  whatExceptionalAboutIt,
+}: SavePlaceInput) => {
+  const place = await getPlace(googlePlaceId);
 
-  const d = await getFirestore()
+  await getFirestore()
     .collection(FirestoreCollections.exceptionalPlaces)
     .add({
       ...place,
-      exceptionalThings,
+      userId,
+      whatExceptionalAboutIt,
     });
-
-  return { placeId: id, exceptionalThings };
 };
 
 export { savePlace, type SavePlaceInput };
