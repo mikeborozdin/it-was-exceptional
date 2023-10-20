@@ -127,6 +127,19 @@ export default function AddPage() {
           />
         </div>
 
+        <div>
+          <label className="font-bold text-white">Photos</label>
+          <input
+            type="file"
+            className="w-full"
+            accept="image/*"
+            multiple
+            onChange={(e) => {
+              console.log({ e });
+            }}
+          />
+        </div>
+
         <div className="w-full">
           <input
             type="submit"

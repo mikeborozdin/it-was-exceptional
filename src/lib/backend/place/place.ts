@@ -50,8 +50,7 @@ const getPlace = async (googlePlaceId: string): Promise<Place> => {
     `https://api.zembra.io/business/google/?slug=${googlePlaceId}&fields[]=address&fields[]=name&fields[]=website&fields[]=profileImage&fields[]=url`,
     {
       headers: {
-        Authorization:
-          "Bearer 2oAdRl1Q5bd5s4VAKIChLes0KjVRfYUurKEWddM6IMyeJ8o12tzuYh7KELmjyrhZZEAiGLK9c8W041on12zWEbleg1k9QCWUirclMd1lchni5MLyfEfei4PYK39ea5KW",
+        Authorization: `Bearer ${process.env.ZEMBRA_API_KEY}`,
         accept: "application/json",
       },
     }
