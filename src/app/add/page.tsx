@@ -13,6 +13,31 @@ import Link from "next/link";
 import { LoadingMessages } from "@/lib/frontend/components/LoadingMessages/LoadingMessages";
 import { LoadingSpinner } from "@/lib/frontend/components/LoadingSpinner/LoadingSpinner";
 import { PhotoUpload } from "@/lib/shared/types/PhotoUpload";
+import wordsCount from "words-count";
+
+const MIN_WORDS = 5;
+
+const encourageWriting = (text: string) => {
+  const words = wordsCount(text);
+
+  if (words < MIN_WORDS) {
+    return (
+      <p className="font-bold text-orange-500">
+        Just write {MIN_WORDS - words} words and you&apos; done
+      </p>
+    );
+  } else if (words < MIN_WORDS + 5) {
+    return (
+      <p className="font-bold text-green-500">✅ You&apos;re doing well!</p>
+    );
+  } else {
+    return (
+      <p className="font-bold text-green-500">
+        🌟 Oh, wow you&apos;re really going for it!
+      </p>
+    );
+  }
+};
 
 const useServerActionMutate = (
   action: (input: SavePlaceInput) => Promise<any>
@@ -156,6 +181,8 @@ export default function AddPage() {
             className="w-full h-60 p-3 text-black text-2xl rounded-lg"
             placeholder="I had such a lovely time there..."
           />
+
+          <div>{encourageWriting(whatExceptionalAboutIt)}</div>
         </div>
 
         <div>

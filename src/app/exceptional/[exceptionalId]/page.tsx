@@ -74,7 +74,7 @@ export default function ExceptionalThingPage({
                 rel="nofollow noopener"
                 className="underline"
               >
-                This place on Google
+                Look up on Google Maps
               </Link>
             </div>
           </div>
