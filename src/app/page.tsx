@@ -1,5 +1,6 @@
 "use client";
 
+import { LoadingSpinner } from "@/lib/frontend/components/LoadingSpinner/LoadingSpinner";
 import { getCountry } from "@/lib/frontend/countries/countries";
 import { initFirestore } from "@/lib/frontend/firebase/firestore";
 import { exceptionalThingConverter } from "@/lib/frontend/firebase/firestoreConverters";
@@ -9,7 +10,7 @@ import Link from "next/link";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 
 export default function Home() {
-  const [exceptionalThings] = useCollectionData(
+  const [exceptionalThings, isLoading] = useCollectionData(
     query(
       collection(initFirestore(), FirestoreCollections.exceptionalPlaces),
       orderBy("createdAt", "desc")
@@ -28,6 +29,8 @@ export default function Home() {
           Add yours
         </Link>
       </div>
+
+      {isLoading && <LoadingSpinner />}
 
       <div className="space-y-3">
         {exceptionalThings?.map((thing, index) => (

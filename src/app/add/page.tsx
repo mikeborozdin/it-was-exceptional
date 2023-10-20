@@ -72,6 +72,7 @@ export default function AddPage() {
               className: "w-full text-black",
               onChange: (value) => {
                 if (value) {
+                  console.log({ value });
                   setPlaceId(value.value.place_id);
                 }
               },
