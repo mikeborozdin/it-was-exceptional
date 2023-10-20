@@ -19,6 +19,14 @@ export default function Home() {
 
   return (
     <div className="space-y-10">
+      {/* <p>
+        How often people ask you what&apos; your favourite restaurant - and you
+        struggle to answer?<br></br>
+        Personally, I struggle. But... what I don't struggle with - is
+        rememberbing all the exceptional places I've been to. So here's the
+        website for all of us - lovers of exceptional things.
+      </p> */}
+
       <h1 className="text-3xl font-extrabold">Latest exceptional things</h1>
 
       <div className="flex flex-row justify-center">
