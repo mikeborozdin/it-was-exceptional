@@ -37,7 +37,7 @@ export default function Home() {
           <div key={index}>
             <div>
               <Link
-                href={`/users/${thing.user.id}`}
+                href={`/user/${thing.user.id}`}
                 className="font-bold underline"
               >
                 {thing.user.name}

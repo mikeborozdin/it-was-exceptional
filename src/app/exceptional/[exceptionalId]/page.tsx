@@ -126,7 +126,7 @@ export default function ExceptionalThingPage({
                       exceptionalThing.whatExceptionalAboutIt
                     }
                     onChange={(e) => setWhatExceptionalAboutIt(e.target.value)}
-                    className="w-full h-32 p-3 text-black text-2xl rounded-lg"
+                    className="w-full h-32 p-3 text-black text-2xl rounded-lg h-60"
                     placeholder="I had such a lovely time there..."
                   />
                 </div>
@@ -147,33 +147,35 @@ export default function ExceptionalThingPage({
               </div>
             )}
 
-            {exceptionalThing.photos && exceptionalThing.photos.length > 0 && (
-              <div className="flex flex-col space-y-3">
-                {exceptionalThing.photos.map((photo, index) => (
-                  <div key={index}>
-                    {photo}
-                    <Image
-                      src={photo}
-                      alt="thing photo"
-                      className="w-full h-auto max-h-96"
-                      width={400}
-                      height={400}
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {exceptionalThing.profilePhoto && (
-              <Image
-                src={exceptionalThing?.profilePhoto}
-                alt="thing photo"
-                className="w-full h-auto max-h-96"
-                width={400}
-                height={400}
-              />
-            )}
+            {exceptionalThing.photos.length === 0 &&
+              exceptionalThing.profilePhoto && (
+                <div>
+                  <p>Photo from Google</p>
+                  <Image
+                    src={exceptionalThing?.profilePhoto}
+                    alt="photo from google"
+                    height={700}
+                    width={700}
+                  />
+                </div>
+              )}
           </div>
+
+          {exceptionalThing.photos && exceptionalThing.photos.length > 0 && (
+            <div className="flex flex-col space-y-3">
+              <p>User&apos;s photos</p>
+              {exceptionalThing.photos.map((photo, index) => (
+                <div key={index}>
+                  <Image
+                    src={photo}
+                    alt="thing photo"
+                    height={700}
+                    width={700}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
 
           <div className="space-y-0">
             <Link
