@@ -12,6 +12,7 @@ import Confetti from "react-confetti";
 import Link from "next/link";
 import { LoadingMessages } from "@/lib/frontend/components/LoadingMessages/LoadingMessages";
 import { LoadingSpinner } from "@/lib/frontend/components/LoadingSpinner/LoadingSpinner";
+import { PhotoUpload } from "@/lib/shared/types/PhotoUpload";
 
 const useServerActionMutate = (
   action: (input: SavePlaceInput) => Promise<any>
@@ -39,12 +40,25 @@ const useServerActionMutate = (
   return { error, isMutating, isSuccess, mutate, result };
 };
 
+const toBase64 = (file: any): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () =>
+      reader.result
+        ? resolve(reader.result?.toString().replace(/^data:.+;base64,/, ""))
+        : reject();
+    reader.onerror = reject;
+  });
+
 initFirebase();
 
 export default function AddPage() {
   const [placeId, setPlaceId] = useState<string | null>(null);
   const [whatExceptionalAboutIt, setWhatExceptionalAboutIt] =
     useState<string>("");
+
+  const [photosBase64, setPhotosBase64] = useState<PhotoUpload[]>([]);
 
   const { mutate, isMutating, isSuccess, result } =
     useServerActionMutate(savePlace);
@@ -58,6 +72,23 @@ export default function AddPage() {
       redirect("/signup");
     }
   }, [authState, loading]);
+
+  const onUpload = async (e: any) => {
+    e.preventDefault();
+
+    const reader = new FileReader();
+
+    for (const file of e.target.files) {
+      if (reader && file) {
+        const base64 = await toBase64(file);
+
+        setPhotosBase64((photos) => [
+          ...photos,
+          { fileName: file.name, base64 },
+        ]);
+      }
+    }
+  };
 
   if (isSuccess) {
     return (
@@ -134,8 +165,8 @@ export default function AddPage() {
             className="w-full"
             accept="image/*"
             multiple
-            onChange={(e) => {
-              console.log({ e });
+            onChange={async (e) => {
+              await onUpload(e);
             }}
           />
         </div>
@@ -162,6 +193,7 @@ export default function AddPage() {
                     name: authState!.displayName || authState!.email || "",
                   },
                   whatExceptionalAboutIt,
+                  photosBase64,
                 });
               }
             }}

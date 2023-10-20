@@ -34,6 +34,7 @@ const exceptionalThingConverter: FirestoreDataConverter<ExceptionalThing> = {
       website: data.url,
       profilePhoto: data.profilePhoto,
       googleMapsUrl: data.googleMapsUrl,
+      photos: data.photos,
     };
   },
 };

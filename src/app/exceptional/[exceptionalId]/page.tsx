@@ -147,6 +147,23 @@ export default function ExceptionalThingPage({
               </div>
             )}
 
+            {exceptionalThing.photos && exceptionalThing.photos.length > 0 && (
+              <div className="flex flex-col space-y-3">
+                {exceptionalThing.photos.map((photo, index) => (
+                  <div key={index}>
+                    {photo}
+                    <Image
+                      src={photo}
+                      alt="thing photo"
+                      className="w-full h-auto max-h-96"
+                      width={400}
+                      height={400}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+
             {exceptionalThing.profilePhoto && (
               <Image
                 src={exceptionalThing?.profilePhoto}

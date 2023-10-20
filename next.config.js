@@ -2,6 +2,7 @@
 const nextConfig = {
   experimental: {
     serverActions: true,
+    serverActionsBodySizeLimit: '10mb',
   },
   images: {
     domains: [
@@ -25,7 +26,8 @@ const nextConfig = {
       'lh17.googleusercontent.com', 
       'lh18.googleusercontent.com',
       'lh19.googleusercontent.com', 
-      'lh20.googleusercontent.com']
+      'lh20.googleusercontent.com',
+      'yote5zsaxkbeya8h.public.blob.vercel-storage.com']
     ,
   }
 };

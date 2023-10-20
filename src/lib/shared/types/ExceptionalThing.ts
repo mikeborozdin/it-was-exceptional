@@ -16,6 +16,7 @@ interface ExceptionalThing {
   website?: string;
   profilePhoto?: string;
   googleMapsUrl: string;
+  photos: string[];
 }
 
 export { type ExceptionalThing };
