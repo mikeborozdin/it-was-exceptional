@@ -21,10 +21,10 @@ export default function Home() {
     <div className="space-y-10">
       <h1 className="text-3xl font-extrabold">Latest exceptional things</h1>
 
-      <div>
+      <div className="flex flex-row justify-center">
         <Link
           href="/add"
-          className="bg-blue-500 text-white font-bold p-3 rounded-full hover:cursor-pointer hover:bg-blue-400"
+          className="bg-blue-500 text-white font-bold py-3 px-10 rounded-full hover:cursor-pointer hover:bg-blue-400"
         >
           Add yours
         </Link>
@@ -36,7 +36,13 @@ export default function Home() {
         {exceptionalThings?.map((thing, index) => (
           <div key={index}>
             <div>
-              {thing.user.name} says{" "}
+              <Link
+                href={`/users/${thing.user.id}`}
+                className="font-bold underline"
+              >
+                {thing.user.name}
+              </Link>{" "}
+              says{" "}
               <Link
                 href={`/exceptional/${thing.id}`}
                 className="font-bold underline"

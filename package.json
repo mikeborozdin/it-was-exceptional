@@ -14,10 +14,12 @@
     "firebase-admin": "^11.11.0",
     "next": "13.5.4",
     "react": "^18",
+    "react-confetti": "^6.1.0",
     "react-dom": "^18",
     "react-firebase-hooks": "^5.1.1",
     "react-google-places-autocomplete": "^4.0.1",
     "react-spinners": "^0.13.8",
+    "react-use": "^17.4.0",
     "swr": "^2.2.4"
   },
   "devDependencies": {

@@ -86,7 +86,7 @@ const savePlace = async ({
 }: SavePlaceInput) => {
   const place = await getPlace(googlePlaceId);
 
-  await getFirestore()
+  const res = await getFirestore()
     .collection(FirestoreCollections.exceptionalPlaces)
     .add({
       ...place,
@@ -94,6 +94,8 @@ const savePlace = async ({
       whatExceptionalAboutIt,
       createdAt: new Date(),
     });
+
+  return res.id;
 };
 
 export { savePlace, type SavePlaceInput };
