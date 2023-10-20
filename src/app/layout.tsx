@@ -26,6 +26,7 @@ export default function RootLayout({
           content="Find and share all the exceptional places"
         />
         <meta property="og:type" content="website" />
+        <meta property="og:image" content="/api/og" />
       </head>
       <body className="bg-black p-3 min-h-screen text-white flex flex-col space-y-10 md:w-1/2 md:m-auto">
         <TopNavigation />
