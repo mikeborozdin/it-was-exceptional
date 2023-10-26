@@ -1,21 +1,34 @@
-"use client";
-
 import { LoadingSpinner } from "@/lib/frontend/components/LoadingSpinner/LoadingSpinner";
-import { getCountry } from "@/lib/frontend/countries/countries";
-import { initFirestore } from "@/lib/frontend/firebase/firestore";
-import { exceptionalThingConverter } from "@/lib/frontend/firebase/firestoreConverters";
 import { FirestoreCollections } from "@/lib/shared/firestore/firestore";
-import { collection, orderBy, query } from "firebase/firestore";
 import Link from "next/link";
-import { useCollectionData } from "react-firebase-hooks/firestore";
+import * as admin from "firebase-admin";
+import { getApps } from "firebase-admin/app";
+import { exceptionalThingConverter } from "@/lib/frontend/firebase/firestoreConverters";
+import { ExceptionalList } from "@/lib/frontend/components/ExceptionalList/ExceptionalList";
+import { ExceptionalThing } from "@/lib/shared/types/ExceptionalThing";
 
-export default function Home() {
-  const [exceptionalThings, isLoading] = useCollectionData(
-    query(
-      collection(initFirestore(), FirestoreCollections.exceptionalPlaces),
-      orderBy("createdAt", "desc")
-    ).withConverter(exceptionalThingConverter)
-  );
+const getThings = async (): Promise<ExceptionalThing[]> => {
+  if (getApps().length === 0) {
+    admin.initializeApp({
+      credential: admin.credential.cert(
+        JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT as string)
+      ),
+    });
+  }
+
+  const things = await admin
+    .firestore()
+    .collection(FirestoreCollections.exceptionalPlaces)
+    .orderBy("createdAt", "desc")
+    .withConverter(exceptionalThingConverter as any)
+    .get();
+
+  return things.docs.map((doc) => doc.data()) as ExceptionalThing[];
+};
+
+export default async function Home() {
+  const exceptionalThings = await getThings();
+  const isLoading = false;
 
   return (
     <div className="space-y-10">
@@ -40,31 +53,7 @@ export default function Home() {
 
       {isLoading && <LoadingSpinner />}
 
-      <div className="space-y-3">
-        {exceptionalThings?.map((thing, index) => (
-          <div key={index}>
-            <div>
-              <Link
-                href={`/user/${thing.user.id}`}
-                className="font-bold underline"
-              >
-                {thing.user.name}
-              </Link>{" "}
-              says{" "}
-              <Link
-                href={`/exceptional/${thing.id}`}
-                className="font-bold underline"
-              >
-                {thing.name}
-              </Link>{" "}
-              is exceptional in{" "}
-              <strong>
-                {thing.address.city}, {getCountry(thing.address.country)}
-              </strong>
-            </div>
-          </div>
-        ))}
-      </div>
+      <ExceptionalList exceptionalThings={exceptionalThings} />
     </div>
   );
 }
