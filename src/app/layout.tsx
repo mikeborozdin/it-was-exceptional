@@ -2,8 +2,17 @@ import { TopNavigation } from "@/lib/frontend/components/TopNavigation/TopNaviga
 import "./globals.css";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = {
-  title: "It is exceptional",
+export const generateMetadata = async ({
+  params,
+}: {
+  params: { exceptionalId: string };
+}): Promise<Metadata> => {
+  return {
+    title: "It is exceptional",
+    openGraph: {
+      images: ["/api/og"],
+    },
+  };
 };
 
 export default function RootLayout({
@@ -26,7 +35,6 @@ export default function RootLayout({
           content="Find and share all the exceptional places"
         />
         <meta property="og:type" content="website" />
-        <meta property="og:image" content="/api/og" />
       </head>
       <body className="bg-black p-3 min-h-screen text-white flex flex-col space-y-10 md:w-1/2 md:m-auto">
         <TopNavigation />
