@@ -5,8 +5,6 @@ import { ExceptionalThing } from "@/lib/shared/types/ExceptionalThing";
 import { credential } from "firebase-admin";
 import { getApps, initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
-import { put } from "@vercel/blob";
-import { PhotoUpload } from "@/lib/shared/types/PhotoUpload";
 
 interface Place {
   googlePlaceId: string;
@@ -85,30 +83,16 @@ const getPlace = async (googlePlaceId: string): Promise<Place> => {
 
 type SavePlaceInput = Pick<
   ExceptionalThing,
-  "googlePlaceId" | "whatExceptionalAboutIt" | "user"
-> & {
-  photosBase64: PhotoUpload[];
-};
+  "googlePlaceId" | "whatExceptionalAboutIt" | "user" | "photos"
+>;
 
 const savePlace = async ({
   googlePlaceId,
   user,
   whatExceptionalAboutIt,
-  photosBase64,
+  photos,
 }: SavePlaceInput) => {
   const place = await getPlace(googlePlaceId);
-
-  const photos = await Promise.all(
-    photosBase64.map(async (photoUpload) => {
-      const binary = Buffer.from(photoUpload.base64, "base64");
-
-      const res = await put("photos/photo", binary, {
-        access: "public",
-      });
-
-      return res.url;
-    })
-  );
 
   const res = await getFirestore()
     .collection(FirestoreCollections.exceptionalPlaces)
