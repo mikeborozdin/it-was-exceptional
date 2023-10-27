@@ -202,9 +202,6 @@ export default function AddPage() {
             accept="image/*"
             multiple
             ref={inputFileRef}
-            // onChange={async (e) => {
-            //   await onUpload(e);
-            // }}
           />
         </div>
 
