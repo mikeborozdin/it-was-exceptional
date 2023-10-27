@@ -2,7 +2,7 @@
 
 import { SavePlaceInput, savePlace } from "@/lib/backend/place/place";
 import { getAuth } from "firebase/auth";
-import { useEffect, useState } from "react";
+import { RefObject, useEffect, useRef, useState } from "react";
 import GooglePlacesAutocomplete from "react-google-places-autocomplete";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { initFirebase } from "@/lib/frontend/firebase/firebase";
@@ -12,8 +12,8 @@ import Confetti from "react-confetti";
 import Link from "next/link";
 import { LoadingMessages } from "@/lib/frontend/components/LoadingMessages/LoadingMessages";
 import { LoadingSpinner } from "@/lib/frontend/components/LoadingSpinner/LoadingSpinner";
-import { PhotoUpload } from "@/lib/shared/types/PhotoUpload";
 import wordsCount from "words-count";
+import { upload } from "@vercel/blob/client";
 
 const MIN_WORDS = 5;
 
@@ -39,19 +39,39 @@ const encourageWriting = (text: string) => {
   }
 };
 
-const useServerActionMutate = (
-  action: (input: SavePlaceInput) => Promise<any>
-) => {
+const useServerActionMutate = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [isMutating, setIsMutating] = useState(false);
   const [error, setError] = useState<any>(null);
 
-  const mutate = async (input: SavePlaceInput) => {
+  const mutate = async (
+    input: Omit<SavePlaceInput, "photos">,
+    inputFileRef: RefObject<HTMLInputElement>
+  ) => {
     try {
       setIsMutating(true);
 
-      const newResult = await action(input);
+      const photos: string[] = [];
+
+      if (inputFileRef.current && inputFileRef.current.files) {
+        const uploadPromises = [];
+
+        for (let i = 0; i < inputFileRef.current.files.length; i++) {
+          const file = inputFileRef.current.files[i];
+
+          uploadPromises.push(
+            upload(file.name, file, {
+              access: "public",
+              handleUploadUrl: "/api/upload",
+            })
+          );
+        }
+
+        photos.push(...(await Promise.all(uploadPromises)).map((r) => r.url));
+      }
+
+      const newResult = await savePlace({ ...input, photos });
 
       setResult(newResult);
       setIsSuccess(true);
@@ -65,17 +85,6 @@ const useServerActionMutate = (
   return { error, isMutating, isSuccess, mutate, result };
 };
 
-const toBase64 = (file: any): Promise<string> =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () =>
-      reader.result
-        ? resolve(reader.result?.toString().replace(/^data:.+;base64,/, ""))
-        : reject();
-    reader.onerror = reject;
-  });
-
 initFirebase();
 
 export default function AddPage() {
@@ -83,14 +92,13 @@ export default function AddPage() {
   const [whatExceptionalAboutIt, setWhatExceptionalAboutIt] =
     useState<string>("");
 
-  const [photosBase64, setPhotosBase64] = useState<PhotoUpload[]>([]);
-
-  const { mutate, isMutating, isSuccess, result } =
-    useServerActionMutate(savePlace);
+  const { mutate, isMutating, isSuccess, result } = useServerActionMutate();
 
   const [authState, loading] = useAuthState(getAuth());
 
   const { width, height } = useWindowSize();
+
+  const inputFileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!authState && !loading) {
@@ -98,20 +106,21 @@ export default function AddPage() {
     }
   }, [authState, loading]);
 
-  const onUpload = async (e: any) => {
-    e.preventDefault();
+  const onSubmit = async () => {
+    const photos = [];
 
-    const reader = new FileReader();
-
-    for (const file of e.target.files) {
-      if (reader && file) {
-        const base64 = await toBase64(file);
-
-        setPhotosBase64((photos) => [
-          ...photos,
-          { fileName: file.name, base64 },
-        ]);
-      }
+    if (placeId) {
+      mutate(
+        {
+          googlePlaceId: placeId,
+          user: {
+            id: authState!.uid,
+            name: authState!.displayName || authState!.email || "",
+          },
+          whatExceptionalAboutIt,
+        },
+        inputFileRef
+      );
     }
   };
 
@@ -192,9 +201,10 @@ export default function AddPage() {
             className="w-full"
             accept="image/*"
             multiple
-            onChange={async (e) => {
-              await onUpload(e);
-            }}
+            ref={inputFileRef}
+            // onChange={async (e) => {
+            //   await onUpload(e);
+            // }}
           />
         </div>
 
@@ -211,19 +221,7 @@ export default function AddPage() {
                 whatExceptionalAboutIt.trim().length >= 10
               )
             }
-            onClick={async () => {
-              if (placeId) {
-                mutate({
-                  googlePlaceId: placeId,
-                  user: {
-                    id: authState!.uid,
-                    name: authState!.displayName || authState!.email || "",
-                  },
-                  whatExceptionalAboutIt,
-                  photosBase64,
-                });
-              }
-            }}
+            onClick={onSubmit}
           />
         </div>
       </div>
