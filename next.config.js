@@ -1,9 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    serverActions: true,
-    serverActionsBodySizeLimit: '100mb',
-  },
   images: {
     domains: [
       'lh0.googleusercontent.com',

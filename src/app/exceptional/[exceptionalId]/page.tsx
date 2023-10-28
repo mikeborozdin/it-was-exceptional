@@ -1,28 +1,6 @@
-import { exceptionalThingConverter } from "@/lib/frontend/firebase/firestoreConverters";
-import { FirestoreCollections } from "@/lib/shared/firestore/firestore";
-import * as admin from "firebase-admin";
-import { getApps } from "firebase-admin/app";
-import { ExceptionalThing } from "@/lib/shared/types/ExceptionalThing";
+import { getThing } from "@/lib/backend/place/place";
 import { ViewExceptionalThing } from "@/lib/frontend/components/ViewExceptionalThing/ViewExceptionalThing";
 import { Metadata } from "next";
-
-const getThing = async (id: string): Promise<ExceptionalThing> => {
-  if (getApps().length === 0) {
-    admin.initializeApp({
-      credential: admin.credential.cert(
-        JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT as string)
-      ),
-    });
-  }
-
-  const things = await admin
-    .firestore()
-    .doc(`${FirestoreCollections.exceptionalPlaces}/${id}`)
-    .withConverter(exceptionalThingConverter as any)
-    .get();
-
-  return things.data() as ExceptionalThing;
-};
 
 export const generateMetadata = async ({
   params,
