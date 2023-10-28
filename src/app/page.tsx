@@ -1,30 +1,7 @@
 import { LoadingSpinner } from "@/lib/frontend/components/LoadingSpinner/LoadingSpinner";
-import { FirestoreCollections } from "@/lib/shared/firestore/firestore";
 import Link from "next/link";
-import * as admin from "firebase-admin";
-import { getApps } from "firebase-admin/app";
-import { exceptionalThingConverter } from "@/lib/frontend/firebase/firestoreConverters";
 import { ExceptionalList } from "@/lib/frontend/components/ExceptionalList/ExceptionalList";
-import { ExceptionalThing } from "@/lib/shared/types/ExceptionalThing";
-
-const getThings = async (): Promise<ExceptionalThing[]> => {
-  if (getApps().length === 0) {
-    admin.initializeApp({
-      credential: admin.credential.cert(
-        JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT as string)
-      ),
-    });
-  }
-
-  const things = await admin
-    .firestore()
-    .collection(FirestoreCollections.exceptionalPlaces)
-    .orderBy("createdAt", "desc")
-    .withConverter(exceptionalThingConverter as any)
-    .get();
-
-  return things.docs.map((doc) => doc.data()) as ExceptionalThing[];
-};
+import { getThings } from "@/lib/backend/place/place";
 
 export default async function Home() {
   const exceptionalThings = await getThings();

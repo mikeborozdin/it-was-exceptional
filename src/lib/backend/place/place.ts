@@ -1,10 +1,21 @@
 "use server";
 
+import { exceptionalThingConverter } from "@/lib/frontend/firebase/firestoreConverters";
 import { FirestoreCollections } from "@/lib/shared/firestore/firestore";
 import { ExceptionalThing } from "@/lib/shared/types/ExceptionalThing";
 import { credential } from "firebase-admin";
 import { getApps, initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
+
+const initFirebaseAdmin = () => {
+  if (getApps().length === 0) {
+    initializeApp({
+      credential: credential.cert(
+        JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT as string)
+      ),
+    });
+  }
+};
 
 interface Place {
   googlePlaceId: string;
@@ -37,15 +48,9 @@ interface ZembraResult {
   data: ZembraPlace;
 }
 
-if (getApps().length === 0) {
-  initializeApp({
-    credential: credential.cert(
-      JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT as string)
-    ),
-  });
-}
-
 const getPlace = async (googlePlaceId: string): Promise<Place> => {
+  initFirebaseAdmin();
+
   try {
     const res = await fetch(
       `https://api.zembra.io/business/google/?slug=${googlePlaceId}&fields[]=address&fields[]=name&fields[]=website&fields[]=profileImage&fields[]=url`,
@@ -107,4 +112,27 @@ const savePlace = async ({
   return res.id;
 };
 
-export { savePlace, type SavePlaceInput };
+const getThings = async () => {
+  initFirebaseAdmin();
+
+  const things = await getFirestore()
+    .collection(FirestoreCollections.exceptionalPlaces)
+    .orderBy("createdAt", "desc")
+    .withConverter(exceptionalThingConverter as any)
+    .get();
+
+  return things.docs.map((doc) => doc.data() as ExceptionalThing);
+};
+
+const getThing = async (id: string): Promise<ExceptionalThing> => {
+  initFirebaseAdmin();
+
+  const things = await getFirestore()
+    .doc(`${FirestoreCollections.exceptionalPlaces}/${id}`)
+    .withConverter(exceptionalThingConverter as any)
+    .get();
+
+  return things.data() as ExceptionalThing;
+};
+
+export { savePlace, type SavePlaceInput, getThing, getThings };

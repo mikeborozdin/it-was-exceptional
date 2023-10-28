@@ -14,8 +14,6 @@ interface Props {
 }
 
 const ExceptionalList: React.FC<Props> = ({ exceptionalThings }) => {
-  console.group("How many times we render?");
-
   const [exceptionalThingsSnapshot, isLoading] = useCollectionData(
     query(
       collection(initFirestore(), FirestoreCollections.exceptionalPlaces),
